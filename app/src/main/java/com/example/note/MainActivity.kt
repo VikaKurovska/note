@@ -44,8 +44,6 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun NotesScreen() {
-    val isAdded = remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             @OptIn(ExperimentalMaterial3Api::class)
@@ -89,12 +87,13 @@ fun NotesScreen() {
             }
             Spacer(modifier = Modifier.width(90.dp))
         },
-        floatingActionButtonPosition = FabPosition.End ,
+        floatingActionButtonPosition = FabPosition.End,
 
-    ) { innerPadding ->
+        ) { innerPadding ->
         // Основний контент екрану
         Box(modifier = Modifier.padding(innerPadding)) {
             // Тут будуть твої нотатки
         }
     }
+
 }
