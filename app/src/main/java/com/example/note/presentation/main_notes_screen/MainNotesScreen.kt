@@ -1,4 +1,4 @@
-package com.example.note.screens.main_notes_screen
+package com.example.note.presentation.main_notes_screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,10 +12,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.note.EmptyNoteScreen
 import com.example.note.R
-import com.example.note.screens.main_notes_screen.notes_list.NotesList
-import com.example.note.screens.main_notes_screen.notes_list.NotesListModes
-import com.example.note.model.Note
-import com.example.note.model.notesList
+import com.example.note.presentation.main_notes_screen.composables.NotesList
+import com.example.note.presentation.main_notes_screen.composables.NotesListModes
+import com.example.note.data.entity.notesList
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -24,6 +23,7 @@ fun NotesScreen(onAddNoteClick: () -> Unit = {}) {
     var searchText by remember { mutableStateOf("") }
     val filteredNotes = notesList.filter { it.title.contains(searchText, ignoreCase = true) }
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
             @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(
@@ -85,7 +85,8 @@ fun NotesScreen(onAddNoteClick: () -> Unit = {}) {
                     onValueChange = { searchText = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = 12.dp)
+                    ,
                     placeholder = { Text("Search...") },
                     singleLine = true,
                     shape = CircleShape,

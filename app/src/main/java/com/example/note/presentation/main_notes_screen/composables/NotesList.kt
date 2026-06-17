@@ -1,18 +1,16 @@
-package com.example.note.screens.main_notes_screen.notes_list
+package com.example.note.presentation.main_notes_screen.composables
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.note.model.Note
-import com.example.note.components.NoteGridCard
-import com.example.note.components.NoteListCard
+import com.example.note.data.entity.Note
+import com.example.note.presentation.components.NoteGridCard
+import com.example.note.presentation.components.NoteListCard
 
 
 @Composable

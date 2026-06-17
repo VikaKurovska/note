@@ -1,14 +1,21 @@
-package com.example.note.model
+package com.example.note.data.entity
 
 import androidx.compose.ui.graphics.Color
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity(tableName = "note")
 data class Note(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "noteId")
+    val id: Int = 0,
     val title: String,
+    val content: String,
     val timestamp: Long = System.currentTimeMillis(),
     val color: Color,
 )
-val notesList = listOf(
+/*val notesList = listOf(
     Note(1, "Shopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping Listj", color = Color(0xFFFFF9C4)), // Light Yellow
     Note(2, "Android Ideas", color = Color(0xFFE3F2FD)), // Light Blue
     Note(3, "Gym Plan", color = Color(0xFFF8BBD0)),    // Pink
@@ -20,3 +27,4 @@ val notesList = listOf(
     Note(9, "App Design", color = Color(0xFFD1C4E9)),   // Deep Purple
     Note(10, "Gift Ideas", color = Color(0xFFF0F4C3))   // Lime
 )
+ */
