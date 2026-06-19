@@ -1,126 +1,146 @@
 package com.example.note.presentation.main_notes_screen
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.note.EmptyNoteScreen
 import com.example.note.R
 import com.example.note.presentation.main_notes_screen.composables.NotesList
 import com.example.note.presentation.main_notes_screen.composables.NotesListModes
-import com.example.note.data.entity.notesList
+
+class NoteViewModelFactory(val application: Application) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return MainNotesViewModel(application) as T
+    }
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun NotesScreen(onAddNoteClick: () -> Unit = {}) {
-    var currentMode by remember { mutableStateOf(NotesListModes.LIST) }
-    var searchText by remember { mutableStateOf("") }
-    val filteredNotes = notesList.filter { it.title.contains(searchText, ignoreCase = true) }
-    Scaffold(
-        modifier = Modifier.imePadding(),
-        topBar = {
-            @OptIn(ExperimentalMaterial3Api::class)
-            TopAppBar(
-                title = {
-                    Text(
-                        "Notes",
-                        fontSize = 36.sp,
-                        modifier = Modifier.padding(start = 10.dp)
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.DarkGray
-                ),
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.img_color),
-                            modifier = Modifier.size(24.dp),
-                            contentDescription = "Зміна теми",
-                        )
-                    }
-                    IconButton(onClick = {
-                        currentMode = if (currentMode == NotesListModes.LIST)
-                            NotesListModes.GRID else NotesListModes.LIST
-                    }) {
-                        Icon(
-                            painter = painterResource(id = if (currentMode == NotesListModes.LIST) R.drawable.img_sort else R.drawable.img_sort_grid),
-                            modifier = Modifier.size(24.dp),
-                            contentDescription = "Сортування",
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(20.dp))
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onAddNoteClick() },
-                shape = CircleShape,
-                containerColor = Color(0xFFFFB74D),
-                modifier = Modifier.size(70.dp),
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.img_plus),
-                    modifier = Modifier.size(28.dp),
-                    contentDescription = "Додати нотатку",
-                    tint = Color.White
-                )
-            }
-            Spacer(modifier = Modifier.width(90.dp))
-        },
-        floatingActionButtonPosition = FabPosition.End,
+    val owner = LocalViewModelStoreOwner.current
 
-        bottomBar = {
-            BottomAppBar {
-                TextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
-                    ,
-                    placeholder = { Text("Search...") },
-                    singleLine = true,
-                    shape = CircleShape,
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.img_search),
-                            contentDescription = "search"
-                        )
+    owner?.let {
+        val viewModel: MainNotesViewModel = viewModel(
+            it,
+            "UserViewModel",
+            NoteViewModelFactory(LocalContext.current.applicationContext as Application)
+        )
 
-                    }, trailingIcon = {
-                        IconButton(onClick = { searchText = "" }) {
+        val notesList by viewModel.noteList.collectAsState()
+
+        var currentMode by remember { mutableStateOf(NotesListModes.LIST) }
+        var searchText by remember { mutableStateOf("") }
+        val filteredNotes = notesList.filter { it.title.contains(searchText, ignoreCase = true) }
+        Scaffold(
+            modifier = Modifier.imePadding(),
+            topBar = {
+                @OptIn(ExperimentalMaterial3Api::class)
+                TopAppBar(
+                    title = {
+                        Text(
+                            "Notes",
+                            fontSize = 36.sp,
+                            modifier = Modifier.padding(start = 10.dp)
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.White,
+                        titleContentColor = Color.DarkGray
+                    ),
+                    actions = {
+                        IconButton(onClick = { }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.img_cancel),
-                                contentDescription = "search"
+                                painter = painterResource(id = R.drawable.img_color),
+                                modifier = Modifier.size(24.dp),
+                                contentDescription = "Зміна теми",
                             )
                         }
+                        IconButton(onClick = {
+                            currentMode = if (currentMode == NotesListModes.LIST)
+                                NotesListModes.GRID else NotesListModes.LIST
+                        }) {
+                            Icon(
+                                painter = painterResource(id = if (currentMode == NotesListModes.LIST) R.drawable.img_sort else R.drawable.img_sort_grid),
+                                modifier = Modifier.size(24.dp),
+                                contentDescription = "Сортування",
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(20.dp))
                     }
                 )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { onAddNoteClick() },
+                    shape = CircleShape,
+                    containerColor = Color(0xFFFFB74D),
+                    modifier = Modifier.size(70.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.img_plus),
+                        modifier = Modifier.size(28.dp),
+                        contentDescription = "Додати нотатку",
+                        tint = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.width(90.dp))
+            },
+            floatingActionButtonPosition = FabPosition.End,
+
+            bottomBar = {
+                BottomAppBar {
+                    TextField(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        placeholder = { Text("Search...") },
+                        singleLine = true,
+                        shape = CircleShape,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.img_search),
+                                contentDescription = "search"
+                            )
+
+                        }, trailingIcon = {
+                            IconButton(onClick = { searchText = "" }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.img_cancel),
+                                    contentDescription = "search"
+                                )
+                            }
+                        }
+                    )
+                }
             }
-        }
-    ) { innerPadding ->
-        // Основний контент екрану
-        Box(modifier = Modifier.padding(innerPadding)) {
-            Column(
-            ) {
+        ) { innerPadding ->
+
+            Box(modifier = Modifier.padding(innerPadding)) {
+                // Перевіряємо: якщо в базі взагалі немає нотаток — показуємо пустий екран
                 if (filteredNotes.isEmpty()) {
                     EmptyNoteScreen()
                 } else {
+                    // Якщо нотатки є — передаємо їх у твій готовий компонент списку!
                     NotesList(notes = filteredNotes, mode = currentMode)
                 }
-
+            }
+                }
             }
         }
-    }
-}
 
 

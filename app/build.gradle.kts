@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
 }
 
 android {
@@ -52,6 +51,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -64,8 +64,8 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.navigation.compose)
-    implementation("com.google.dagger:hilt-android:2.51")
-    kapt("com.google.dagger:hilt-compiler:2.51")
+    implementation("com.google.dagger:hilt-android:2.54") // 👈 Змінили на 2.54
+    ksp("com.google.dagger:hilt-compiler:2.54")
     // Навігація + Хілт (щоб діставати ViewModel в Compose екранах)
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 }

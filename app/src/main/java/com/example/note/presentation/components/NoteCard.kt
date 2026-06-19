@@ -26,7 +26,7 @@ fun NoteGridCard(note: Note) {
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors().copy(containerColor = note.color)
+        colors = CardDefaults.cardColors().copy()
 
 
     ) {
@@ -59,7 +59,7 @@ fun NoteListCard(note: Note) {
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors().copy(containerColor = note.color)
+        colors = CardDefaults.cardColors().copy()
 
 
     ) {
