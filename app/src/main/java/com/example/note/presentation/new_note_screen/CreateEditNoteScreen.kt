@@ -19,6 +19,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,26 +30,49 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.note.R
 import com.example.note.presentation.viewmodel.NewNoteVM
 
 @Composable
-fun CreateNote(
+fun CreateEditNoteScreen(
     viewModel: NewNoteVM,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    id:Int = -1
 ) {
     var titleText by remember { mutableStateOf("") }
     var contentText by remember { mutableStateOf("") }
 
+    LaunchedEffect(id) {
+        viewModel.getNoteFromDB(id)
+    }
+    val noteFromDB by viewModel.noteState.collectAsState()
+    LaunchedEffect(key1 = noteFromDB) {
+        noteFromDB?.let {
+            titleText = it.title
+            contentText = it.content
+        }
+    }
     Scaffold(
         topBar = {
             CreateNoteTopBar(
+                isEditMode = (id != -1),
                 onBackClick = onBackClick,
                 onSaveClick = {
-                    viewModel.saveNote(title = titleText, content = contentText)
+                    if (id == -1) {
+                    viewModel.saveNote(title = titleText, content = contentText)}
+                    else{viewModel.updateNote(
+                        id = id,
+                        title = titleText,
+                        content = contentText,
+                        timestamp = System.currentTimeMillis()
+                    )
+                    }
+                    onBackClick()
+                },
+                onDeleteClick = {
+                    viewModel.deleteNote(id = id) // Видаляємо з бази
                     onBackClick()
                 }
             )
@@ -71,8 +96,10 @@ fun CreateNote(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateNoteTopBar(
+    isEditMode: Boolean,
     onBackClick: () -> Unit,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     TopAppBar(
         navigationIcon = {
@@ -86,15 +113,17 @@ fun CreateNoteTopBar(
             }
         },
         title = {
-            Text("Add Note")
+            Text(if (isEditMode) "Edit Note" else "Add Note")
         },
         actions = {
-            IconButton(onClick = {}) {
-                Icon(
-                    painter = painterResource(id = R.drawable.img_more_new_screen),
-                    modifier = Modifier.size(32.dp),
-                    contentDescription = "Більше інформації"
-                )
+            if(isEditMode) {
+                IconButton(onClick = {onDeleteClick()}) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.img_more_new_screen),
+                        modifier = Modifier.size(32.dp),
+                        contentDescription = "Більше інформації"
+                    )
+                }
             }
             IconButton(
                 onClick = {

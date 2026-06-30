@@ -1,5 +1,6 @@
 package com.example.note.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,11 +21,12 @@ import com.example.note.data.entity.Note
 import com.example.note.utils.timeConvertion
 
 @Composable
-fun NoteGridCard(note: Note) {
+fun NoteGridCard(note: Note, onClick: (Int) -> Unit) {
     val formattedTime = timeConvertion(note.timestamp)
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = { onClick(note.id) }),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors().copy()
 
@@ -38,26 +40,30 @@ fun NoteGridCard(note: Note) {
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Start,
-                modifier = Modifier.fillMaxWidth()
-              .padding(horizontal = 26.dp,vertical = 20.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 26.dp, vertical = 20.dp)
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = formattedTime,
                 fontSize = 14.sp,
                 textAlign = TextAlign.End,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(end = 10.dp, bottom = 10.dp)
             )
         }
     }
 }
+
 @Composable
-fun NoteListCard(note: Note) {
+fun NoteListCard(note: Note, onClick: (Int) -> Unit) {
     val formattedTime = timeConvertion(note.timestamp)
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = { onClick(note.id) }),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors().copy()
 
@@ -71,7 +77,8 @@ fun NoteListCard(note: Note) {
                 textAlign = TextAlign.Center,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 20.dp)
                     .padding(horizontal = 26.dp)
             )
@@ -80,7 +87,8 @@ fun NoteListCard(note: Note) {
                 text = formattedTime,
                 fontSize = 14.sp,
                 textAlign = TextAlign.End,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(end = 10.dp, bottom = 10.dp)
             )
         }

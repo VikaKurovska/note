@@ -20,6 +20,7 @@ import com.example.note.EmptyNoteScreen
 import com.example.note.R
 import com.example.note.presentation.main_notes_screen.composables.NotesList
 import com.example.note.presentation.main_notes_screen.composables.NotesListModes
+import androidx.compose.runtime.collectAsState
 
 class NoteViewModelFactory(val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -27,9 +28,8 @@ class NoteViewModelFactory(val application: Application) : ViewModelProvider.Fac
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun NotesScreen(onAddNoteClick: () -> Unit = {}) {
+fun NotesScreen(onAddNoteClick: () -> Unit = {}, onNoteClick: (Int) -> Unit = {}) {
     val owner = LocalViewModelStoreOwner.current
 
     owner?.let {
@@ -44,6 +44,7 @@ fun NotesScreen(onAddNoteClick: () -> Unit = {}) {
         var currentMode by remember { mutableStateOf(NotesListModes.LIST) }
         var searchText by remember { mutableStateOf("") }
         val filteredNotes = notesList.filter { it.title.contains(searchText, ignoreCase = true) }
+
         Scaffold(
             modifier = Modifier.imePadding(),
             topBar = {
@@ -116,8 +117,8 @@ fun NotesScreen(onAddNoteClick: () -> Unit = {}) {
                                 painter = painterResource(id = R.drawable.img_search),
                                 contentDescription = "search"
                             )
-
-                        }, trailingIcon = {
+                        },
+                        trailingIcon = {
                             IconButton(onClick = { searchText = "" }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.img_cancel),
@@ -129,18 +130,17 @@ fun NotesScreen(onAddNoteClick: () -> Unit = {}) {
                 }
             }
         ) { innerPadding ->
-
             Box(modifier = Modifier.padding(innerPadding)) {
-                // Перевіряємо: якщо в базі взагалі немає нотаток — показуємо пустий екран
                 if (filteredNotes.isEmpty()) {
                     EmptyNoteScreen()
                 } else {
-                    // Якщо нотатки є — передаємо їх у твій готовий компонент списку!
-                    NotesList(notes = filteredNotes, mode = currentMode)
-                }
-            }
+                    NotesList(
+                        notes = filteredNotes,
+                        mode = currentMode,
+                        onNoteClick = onNoteClick
+                    )
                 }
             }
         }
-
-
+    }
+}

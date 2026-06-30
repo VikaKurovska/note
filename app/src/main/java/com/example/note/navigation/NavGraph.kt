@@ -3,13 +3,15 @@ package com.example.note.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.note.presentation.new_note_screen.CreateNote
+import androidx.navigation.navArgument
 import com.example.note.presentation.main_notes_screen.NotesScreen
 import com.example.note.data.database.NoteDatabase // 👈 Перевір свій шлях до бази даних
 import com.example.note.data.repository.NoteRepository // 👈 Перевір шлях до репозиторію
+import com.example.note.presentation.new_note_screen.CreateEditNoteScreen
 import com.example.note.presentation.viewmodel.NewNoteVM
 import com.example.note.presentation.viewmodel.NewNoteViewModelFactory
 
@@ -24,34 +26,33 @@ fun NotesNavGraph() {
         composable(NavRoutes.NotesScreen.route) {
             NotesScreen(
                 onAddNoteClick = {
-                    navController.navigate(NavRoutes.CreateNote.route)
+                    navController.navigate(NavRoutes.CreateNote.passId(-1))
+                },
+                onNoteClick = { id ->
+                    navController.navigate(NavRoutes.CreateNote.passId(id))
+
                 }
             )
         }
 
-        composable(NavRoutes.CreateNote.route) {
-            // 🛠 ЗБИРАЄМО РУЧНИЙ ВОДОПРОВІД ДЛЯ НОВОГО ЕКРАНА САМЕ ТУТ:
-            val context = LocalContext.current
+        composable(route = NavRoutes.CreateNote.route,
+            arguments = listOf(navArgument("noteId") { type = NavType.IntType })) {
+            backStackEntry ->
 
-            // 1. Створюємо/беремо інстанцію бази даних
-            // Примітка: якщо твій клас бази називається NoteDatabase, перевір назву методу (getInstance або замініть на свій)
+            val noteId = backStackEntry.arguments?.getInt("noteId") ?: -1
+            val context = LocalContext.current
             val database = NoteDatabase.getInstance(context.applicationContext)
 
-            // 2. Створюємо Репозиторій і даємо йому DAO
             val repository = NoteRepository(database.noteDao())
 
-            // 3. Створюємо Фабрику, яку ми щойно дописали, і передаємо туди наш репозиторій
             val factory = NewNoteViewModelFactory(repository)
 
-            // 4. Просимо Android дати нам ViewModel, зібрану по цій фабриці
             val newNoteViewModel: NewNoteVM = viewModel(factory = factory)
 
-            // 5. Передаємо готову ViewModel в наш екран
-            CreateNote(
+            CreateEditNoteScreen(
                 viewModel = newNoteViewModel,
+                id = noteId,
                 onBackClick = {
-                    // Краще використовувати popBackStack(), щоб закривати поточний екран,
-                    // а не плодити нові копії головного екрана в пам'яті
                     navController.popBackStack()
                 }
             )

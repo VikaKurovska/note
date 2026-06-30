@@ -16,7 +16,9 @@ import com.example.note.presentation.components.NoteListCard
 @Composable
 fun NotesList(
     notes: List<Note>,          // Список самих нотаток
-    mode: NotesListModes        // Режим: GRID або LIST
+    mode: NotesListModes,
+    onNoteClick:(Int)->Unit
+    // Режим: GRID або LIST
 ) {
     if (mode == NotesListModes.GRID) {
         LazyVerticalStaggeredGrid(
@@ -27,7 +29,7 @@ fun NotesList(
             verticalItemSpacing = 12.dp
         ) {
             items(notes) { note ->
-                NoteGridCard(note = note)
+                NoteGridCard(note = note, onClick = {onNoteClick(it)})
             }
         }
     }
@@ -39,7 +41,9 @@ fun NotesList(
         ) {
             items(notes.size){ note ->
                 val item = notes[note]
-                NoteListCard(note= item)
+                NoteListCard(note= item, onClick = { id->
+onNoteClick(id)
+                })
             }
         }
     }

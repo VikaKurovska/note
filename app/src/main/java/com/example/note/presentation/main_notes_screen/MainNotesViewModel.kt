@@ -22,12 +22,8 @@ class MainNotesViewModel(application: Application) : ViewModel() {
         val userDao = userDb.noteDao()
         repository = NoteRepository(userDao)
 
-        // 3. ОТ ТУТ ГОЛОВНА ВІДМІННІСТЬ ВІД СТАТТІ:
-        // Оскільки Flow працює в асинхронному режимі, ми запускаємо корутину
         viewModelScope.launch {
-            // Підключаємося до репозиторію і починаємо "слухати" базу даних
             repository.getAllNotes().collect { notes ->
-                // Як тільки в базі з'явиться нова нотатка, вона прилетить сюди
                 _noteList.value = notes
             }
         }
