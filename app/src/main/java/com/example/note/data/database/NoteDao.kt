@@ -7,10 +7,9 @@ import com.example.note.data.entity.Note
 import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM note")
-    fun getNotes():Flow<List<Note>>
+
 @Insert
-fun addNote(note: Note)
+fun addNote(note: Note): Long
 
 @Query("DELETE FROM note WHERE noteId = :id")
 fun deleteNote(id: Int)
@@ -20,4 +19,13 @@ fun deleteNote(id: Int)
 
     @Update
     suspend fun updateNote(note: Note)
+
+    @Query("SELECT * FROM note WHERE isArchived = 0 ORDER BY timestamp DESC")
+    fun getActiveNotes(): Flow<List<Note>>
+    @Query("SELECT * FROM note WHERE isArchived = 1 ORDER BY timestamp DESC")
+    fun getArchivedNotes(): Flow<List<Note>>
+    @Query("UPDATE note SET isArchived = 1 WHERE noteId = :id")
+    suspend fun archiveNote(id: Int)
+    @Query("UPDATE note SET isArchived = 0 WHERE noteId = :id")
+    suspend fun unarchiveNote(id: Int)
 }

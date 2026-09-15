@@ -2,6 +2,7 @@ package com.example.note.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,7 +14,6 @@ import com.example.note.data.database.NoteDatabase // 👈 Перевір сві
 import com.example.note.data.repository.NoteRepository // 👈 Перевір шлях до репозиторію
 import com.example.note.presentation.new_note_screen.CreateEditNoteScreen
 import com.example.note.presentation.viewmodel.NewNoteVM
-import com.example.note.presentation.viewmodel.NewNoteViewModelFactory
 
 @Composable
 fun NotesNavGraph() {
@@ -40,14 +40,14 @@ fun NotesNavGraph() {
             backStackEntry ->
 
             val noteId = backStackEntry.arguments?.getInt("noteId") ?: -1
-            val context = LocalContext.current
-            val database = NoteDatabase.getInstance(context.applicationContext)
+//            val context = LocalContext.current
+//            val database = NoteDatabase.getInstance(context.applicationContext)
+//
+//            val repository = NoteRepository(database.noteDao())
+//
+//            val factory = NewNoteViewModelFactory(repository)
 
-            val repository = NoteRepository(database.noteDao())
-
-            val factory = NewNoteViewModelFactory(repository)
-
-            val newNoteViewModel: NewNoteVM = viewModel(factory = factory)
+            val newNoteViewModel: NewNoteVM = hiltViewModel()
 
             CreateEditNoteScreen(
                 viewModel = newNoteViewModel,

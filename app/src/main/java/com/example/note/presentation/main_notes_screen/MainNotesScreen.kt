@@ -1,49 +1,60 @@
 package com.example.note.presentation.main_notes_screen
 
-import android.app.Application
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.note.EmptyNoteScreen
 import com.example.note.R
 import com.example.note.presentation.main_notes_screen.composables.NotesList
 import com.example.note.presentation.main_notes_screen.composables.NotesListModes
-import androidx.compose.runtime.collectAsState
 
-class NoteViewModelFactory(val application: Application) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainNotesViewModel(application) as T
-    }
-}
-
+@Preview
 @Composable
-fun NotesScreen(onAddNoteClick: () -> Unit = {}, onNoteClick: (Int) -> Unit = {}) {
-    val owner = LocalViewModelStoreOwner.current
+fun NotesScreen(viewModel: MainNotesViewModel = hiltViewModel(),onAddNoteClick: () -> Unit = {}, onNoteClick: (Int) -> Unit = {}) {
+    //val owner = LocalViewModelStoreOwner.current
 
-    owner?.let {
-        val viewModel: MainNotesViewModel = viewModel(
-            it,
-            "UserViewModel",
-            NoteViewModelFactory(LocalContext.current.applicationContext as Application)
-        )
-
+    //owner?.let {
+//            viewModel(
+//            it,
+//            "UserViewModel",
+//            NoteViewModelFactory(LocalContext.current.applicationContext as Application)
+//        )
+//
         val notesList by viewModel.noteList.collectAsState()
 
         var currentMode by remember { mutableStateOf(NotesListModes.LIST) }
         var searchText by remember { mutableStateOf("") }
-        val filteredNotes = notesList.filter { it.title.contains(searchText, ignoreCase = true) }
+        val filteredNotes = notesList.filter { it.title.contains(searchText, ignoreCase = true) || it.content.contains(other = searchText,ignoreCase = true ) }
 
         Scaffold(
             modifier = Modifier.imePadding(),
@@ -119,6 +130,7 @@ fun NotesScreen(onAddNoteClick: () -> Unit = {}, onNoteClick: (Int) -> Unit = {}
                             )
                         },
                         trailingIcon = {
+//додати умову
                             IconButton(onClick = { searchText = "" }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.img_cancel),
@@ -143,4 +155,3 @@ fun NotesScreen(onAddNoteClick: () -> Unit = {}, onNoteClick: (Int) -> Unit = {}
             }
         }
     }
-}

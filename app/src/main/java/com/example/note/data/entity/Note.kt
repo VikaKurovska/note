@@ -13,7 +13,8 @@ data class Note(
     val title: String,
     val content: String,
     val timestamp: Long = System.currentTimeMillis(),
-    val color: Int
+    val color: Int,
+    val isArchived: Boolean = false,
 )
 /*val notesList = listOf(
     Note(1, "Shopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping ListjShopping Listj", color = Color(0xFFFFF9C4)), // Light Yellow

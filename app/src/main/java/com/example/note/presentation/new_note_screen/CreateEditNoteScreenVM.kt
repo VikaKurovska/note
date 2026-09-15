@@ -1,17 +1,26 @@
 package com.example.note.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.note.R
 import com.example.note.data.entity.Note
 import com.example.note.data.repository.NoteRepository
-import com.example.note.R
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import java.sql.Timestamp
+import javax.inject.Inject
 
-class NewNoteVM(private val repository: NoteRepository) : ViewModel() {
+@OptIn(FlowPreview::class)
+@HiltViewModel
+class NewNoteVM @Inject constructor(
+    private val repository: NoteRepository
+) : ViewModel() {
+
     val availableColors = listOf(
         R.color.LAVANDA,
         R.color.yellow,
@@ -19,66 +28,97 @@ class NewNoteVM(private val repository: NoteRepository) : ViewModel() {
         R.color.blue,
         R.color.green
     )
-    private val _noteState = MutableStateFlow<Note?>(null)
-    val noteState = _noteState.asStateFlow()
-    fun saveNote(title: String, content: String) {
 
-        val randomColorId = availableColors.random()
+    // Поля стану для UI
+    private val _title = MutableStateFlow("")
+    val title: StateFlow<String> = _title.asStateFlow()
+
+    private val _content = MutableStateFlow("")
+    val content: StateFlow<String> = _content.asStateFlow()
+
+    private val _selectedColor = MutableStateFlow(availableColors.random())
+    val selectedColor: StateFlow<Int> = _selectedColor.asStateFlow()
+
+    // ID поточної нотатки (null = нова нотатка, ще не в базі)
+    private var noteId: Int? = null
+
+    init {
+        // Автозбереження: чекаємо 1 сек (1000 ms) після зупинки друку
         viewModelScope.launch {
-            val newNote = Note(
-                title = title,
-                content = content,
-                color = randomColorId // Передаємо ID кольору як Int
-            )
-            repository.insertNote(newNote)
+            combine(_title, _content, _selectedColor) { title, content, color ->
+                Triple(title, content, color)
+            }
+                .debounce(1000L)
+                .collect { (title, content, color) ->
+                    saveNoteToDb(title, content, color)
+                }
         }
     }
 
-        fun getNoteFromDB(id: Int){
-            if(id == -1) return
-            viewModelScope.launch {
-                _noteState.value = repository.getNoteById(id)
+    // Методи для UI (викликаються при фокусі/введенні тексту)
+    fun onTitleChange(newTitle: String) {
+        _title.value = newTitle
+    }
+
+    fun onContentChange(newContent: String) {
+        _content.value = newContent
+    }
+
+    fun onColorChange(newColor: Int) {
+        _selectedColor.value = newColor
+    }
+
+    // Завантаження нотатки при відкритті з головного екрана
+    fun getNoteFromDB(id: Int) {
+        if (id == -1) return // Нова нотатка
+
+        noteId = id
+        viewModelScope.launch {
+            repository.getNoteById(id)?.let { note ->
+                _title.value = note.title
+                _content.value = note.content
+                _selectedColor.value = note.color
             }
         }
-        fun updateNote(id:Int, title: String, content: String, timestamp: Long) {
-            viewModelScope.launch {
-                val currentColor = _noteState.value?.color ?: availableColors.random()
-                val updatedNote = Note(
-                    id = id,
-                    title = title,
-                    content = content,
-                    color = currentColor, // 👈 Тепер усе скомпілюється!
-                    timestamp = timestamp
-                )
-                repository.updateNote(updatedNote)
-            }
+    }
+
+    // Внутрішнє автозбереження
+    private suspend fun saveNoteToDb(title: String, content: String, color: Int) {
+        if (title.isBlank() && content.isBlank()) return
+
+        if (noteId == null) {
+            // Перше збереження -> INSERT (отримуємо новий ID)
+            val newNote = Note(
+                title = title,
+                content = content,
+                color = color,
+                timestamp = System.currentTimeMillis()
+            )
+            val generatedId = repository.insertNote(newNote)
+            noteId = generatedId.toInt()
+        } else {
+            // Повторне збереження -> UPDATE
+            val updatedNote = Note(
+                id = noteId!!,
+                title = title,
+                content = content,
+                color = color,
+                timestamp = System.currentTimeMillis()
+            )
+            repository.updateNote(updatedNote)
         }
-            fun deleteNote(id:Int){
-                viewModelScope.launch {
-                    val currentColor = _noteState.value?.color ?: availableColors.random()
-                    val noteToDelete = Note(
-                        id = id,
-                        title = "",
-                        content = "",
-                        color = currentColor
-                    )
+    }
 
-                    repository.deleteNote(id)
-
-                    _noteState.value = null
-                }
-            }
+    // Примусове збереження (наприклад, при натисканні кнопки "Назад")
+    fun saveOnBack() {
+        viewModelScope.launch {
+            saveNoteToDb(_title.value, _content.value, _selectedColor.value)
         }
+    }
 
-
-
-
-
-class NewNoteViewModelFactory(private val repository: NoteRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NewNoteVM::class.java)) {
-            return NewNoteVM(repository) as T
+    fun deleteNote(id: Int) {
+        viewModelScope.launch {
+            repository.deleteNote(id)
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

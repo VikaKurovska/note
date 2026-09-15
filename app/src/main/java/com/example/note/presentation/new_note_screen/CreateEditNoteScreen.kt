@@ -1,5 +1,6 @@
 package com.example.note.presentation.new_note_screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,13 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -32,61 +31,63 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.note.R
 import com.example.note.presentation.viewmodel.NewNoteVM
 
 @Composable
 fun CreateEditNoteScreen(
-    viewModel: NewNoteVM,
+    id: Int = -1,
     onBackClick: () -> Unit = {},
-    id:Int = -1
+    viewModel: NewNoteVM = hiltViewModel()
 ) {
-    var titleText by remember { mutableStateOf("") }
-    var contentText by remember { mutableStateOf("") }
-
+    // id — це параметр екрана CreateEditNoteScreen(id: Int = -1, ...)
     LaunchedEffect(id) {
-        viewModel.getNoteFromDB(id)
+        viewModel.getNoteFromDB(id) // Викликаємо твій метод з NewNoteVM
     }
-    val noteFromDB by viewModel.noteState.collectAsState()
-    LaunchedEffect(key1 = noteFromDB) {
-        noteFromDB?.let {
-            titleText = it.title
-            contentText = it.content
-        }
-    }
+
+    // 2. Підписуємося на стан з ViewModel (автоматичне перемалювання)
+    val titleText by viewModel.title.collectAsState()
+    val contentText by viewModel.content.collectAsState()
+    val colorInt by viewModel.selectedColor.collectAsState()
+
+    val screenBackgroundColor = Color(colorInt)
+
     Scaffold(
         topBar = {
             CreateNoteTopBar(
                 isEditMode = (id != -1),
-                onBackClick = onBackClick,
+                backgroundColor = screenBackgroundColor,
+                onBackClick = {
+                    viewModel.saveOnBack() // Гарантоване збереження при виході
+                    onBackClick()
+                },
                 onSaveClick = {
-                    if (id == -1) {
-                    viewModel.saveNote(title = titleText, content = contentText)}
-                    else{viewModel.updateNote(
-                        id = id,
-                        title = titleText,
-                        content = contentText,
-                        timestamp = System.currentTimeMillis()
-                    )
-                    }
+                    viewModel.saveOnBack() // Примусове збереження
                     onBackClick()
                 },
                 onDeleteClick = {
-                    viewModel.deleteNote(id = id) // Видаляємо з бази
+                    if (id != -1) {
+                        viewModel.deleteNote(id)
+                    }
                     onBackClick()
                 }
             )
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(screenBackgroundColor)
+        ) {
             Column(modifier = Modifier.imePadding()) {
                 NoteTitleInput(
                     text = titleText,
-                    onTextChange = { titleText = it }
+                    onTextChange = viewModel::onTitleChange
                 )
                 CreateNoteText(
                     text = contentText,
-                    onTextChange = { contentText = it }
+                    onTextChange = viewModel::onContentChange
                 )
             }
         }
@@ -97,13 +98,17 @@ fun CreateEditNoteScreen(
 @Composable
 fun CreateNoteTopBar(
     isEditMode: Boolean,
+    backgroundColor: Color,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = backgroundColor
+        ),
         navigationIcon = {
-            IconButton(onClick = { onBackClick() }) {
+            IconButton(onClick = onBackClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.img_back_screen),
                     modifier = Modifier.size(24.dp),
@@ -116,19 +121,17 @@ fun CreateNoteTopBar(
             Text(if (isEditMode) "Edit Note" else "Add Note")
         },
         actions = {
-            if(isEditMode) {
-                IconButton(onClick = {onDeleteClick()}) {
+            if (isEditMode) {
+                IconButton(onClick = onDeleteClick) {
                     Icon(
                         painter = painterResource(id = R.drawable.img_more_new_screen),
                         modifier = Modifier.size(32.dp),
-                        contentDescription = "Більше інформації"
+                        contentDescription = "Видалити / Більше"
                     )
                 }
             }
             IconButton(
-                onClick = {
-                    onSaveClick()
-                },
+                onClick = onSaveClick,
                 shape = CircleShape,
                 colors = IconButtonDefaults.iconButtonColors().copy(
                     containerColor = colorResource(R.color.WarmYellow)
@@ -147,7 +150,7 @@ fun CreateNoteTopBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NoteTitleInput(text: String, onTextChange: (String) -> Unit){
+fun NoteTitleInput(text: String, onTextChange: (String) -> Unit) {
     TextField(
         value = text,
         onValueChange = onTextChange,
@@ -171,7 +174,9 @@ fun CreateNoteText(text: String, onTextChange: (String) -> Unit) {
         onValueChange = onTextChange,
         placeholder = { Text("Type something...", fontSize = 18.sp) },
         textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
-        modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
@@ -180,4 +185,3 @@ fun CreateNoteText(text: String, onTextChange: (String) -> Unit) {
         )
     )
 }
-
