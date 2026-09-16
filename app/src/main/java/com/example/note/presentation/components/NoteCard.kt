@@ -18,83 +18,66 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.note.data.entity.Note
+import com.example.note.presentation.theme.NoteColors
+import com.example.note.presentation.theme.toComposeColor
 import com.example.note.utils.timeConvertion
 
 @Composable
 fun NoteGridCard(note: Note, onClick: (Int) -> Unit) {
-    val formattedTime = timeConvertion(note.timestamp)
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = { onClick(note.id) }),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors().copy()
-
-
-    ) {
-        Column(modifier = Modifier.padding()) {
-            Text(
-                text = note.title,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 26.dp, vertical = 20.dp)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = formattedTime,
-                fontSize = 14.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 10.dp, bottom = 10.dp)
-            )
-        }
-    }
+    NoteCard(
+        note = note,
+        titleAlign = TextAlign.Start,
+        onClick = onClick,
+    )
 }
 
 @Composable
 fun NoteListCard(note: Note, onClick: (Int) -> Unit) {
+    NoteCard(
+        note = note,
+        titleAlign = TextAlign.Center,
+        onClick = onClick,
+    )
+}
+
+@Composable
+private fun NoteCard(
+    note: Note,
+    titleAlign: TextAlign,
+    onClick: (Int) -> Unit,
+) {
     val formattedTime = timeConvertion(note.timestamp)
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = { onClick(note.id) }),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors().copy()
-
-
+        colors = CardDefaults.cardColors(
+            containerColor = note.color.toComposeColor(),
+            contentColor = NoteColors.onCard.toComposeColor(),
+        ),
     ) {
         Column(modifier = Modifier.padding()) {
             Text(
                 text = note.title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = titleAlign,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 20.dp)
-                    .padding(horizontal = 26.dp)
+                    .padding(horizontal = 26.dp, vertical = 20.dp),
             )
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = formattedTime,
                 fontSize = 14.sp,
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, bottom = 10.dp)
+                    .padding(end = 10.dp, bottom = 10.dp),
             )
         }
     }
 }
-
-
-
-

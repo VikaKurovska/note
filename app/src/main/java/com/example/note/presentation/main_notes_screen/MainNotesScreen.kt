@@ -2,6 +2,7 @@ package com.example.note.presentation.main_notes_screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -28,19 +29,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.example.note.EmptyNoteScreen
 import com.example.note.R
 import com.example.note.presentation.main_notes_screen.composables.NotesList
 import com.example.note.presentation.main_notes_screen.composables.NotesListModes
 
-@Preview
 @Composable
-fun NotesScreen(viewModel: MainNotesViewModel = hiltViewModel(),onAddNoteClick: () -> Unit = {}, onNoteClick: (Int) -> Unit = {}) {
+fun NotesScreen(
+    viewModel: MainNotesViewModel = hiltViewModel(),
+    onAddNoteClick: () -> Unit = {},
+    onNoteClick: (Int) -> Unit = {},
+) {
     //val owner = LocalViewModelStoreOwner.current
 
     //owner?.let {
@@ -142,7 +144,7 @@ fun NotesScreen(viewModel: MainNotesViewModel = hiltViewModel(),onAddNoteClick: 
                 }
             }
         ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding)) {
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                 if (filteredNotes.isEmpty()) {
                     EmptyNoteScreen()
                 } else {

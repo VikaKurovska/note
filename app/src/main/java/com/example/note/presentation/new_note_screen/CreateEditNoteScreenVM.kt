@@ -2,9 +2,9 @@ package com.example.note.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.note.R
 import com.example.note.data.entity.Note
 import com.example.note.data.repository.NoteRepository
+import com.example.note.presentation.theme.NoteColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,14 +21,6 @@ class NewNoteVM @Inject constructor(
     private val repository: NoteRepository
 ) : ViewModel() {
 
-    val availableColors = listOf(
-        R.color.LAVANDA,
-        R.color.yellow,
-        R.color.pink,
-        R.color.blue,
-        R.color.green
-    )
-
     // Поля стану для UI
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title.asStateFlow()
@@ -36,7 +28,7 @@ class NewNoteVM @Inject constructor(
     private val _content = MutableStateFlow("")
     val content: StateFlow<String> = _content.asStateFlow()
 
-    private val _selectedColor = MutableStateFlow(availableColors.random())
+    private val _selectedColor = MutableStateFlow(NoteColors.random())
     val selectedColor: StateFlow<Int> = _selectedColor.asStateFlow()
 
     // ID поточної нотатки (null = нова нотатка, ще не в базі)
