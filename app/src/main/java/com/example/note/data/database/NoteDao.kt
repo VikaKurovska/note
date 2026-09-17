@@ -9,10 +9,10 @@ import kotlinx.coroutines.flow.Flow
 interface NoteDao {
 
 @Insert
-suspend fun addNote(note: Note): Long
+fun addNote(note: Note): Long
 
 @Query("DELETE FROM note WHERE noteId = :id")
-suspend fun deleteNote(id: Int)
+fun deleteNote(id: Int)
 
     @Query("SELECT * FROM note WHERE noteId = :id")
     suspend fun getNoteById(id: Int): Note?

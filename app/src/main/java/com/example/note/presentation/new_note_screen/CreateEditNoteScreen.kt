@@ -1,5 +1,6 @@
 package com.example.note.presentation.new_note_screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,12 +49,15 @@ fun CreateEditNoteScreen(
     // 2. Підписуємося на стан з ViewModel (автоматичне перемалювання)
     val titleText by viewModel.title.collectAsState()
     val contentText by viewModel.content.collectAsState()
+    val colorInt by viewModel.selectedColor.collectAsState()
 
+    val screenBackgroundColor = Color(colorInt)
 
     Scaffold(
         topBar = {
             CreateNoteTopBar(
                 isEditMode = (id != -1),
+                backgroundColor = screenBackgroundColor,
                 onBackClick = {
                     viewModel.saveOnBack() // Гарантоване збереження при виході
                     onBackClick()
@@ -73,6 +78,7 @@ fun CreateEditNoteScreen(
         Box(
             modifier = Modifier
                 .padding(innerPadding)
+                .background(screenBackgroundColor)
         ) {
             Column(modifier = Modifier.imePadding()) {
                 NoteTitleInput(
@@ -92,11 +98,15 @@ fun CreateEditNoteScreen(
 @Composable
 fun CreateNoteTopBar(
     isEditMode: Boolean,
+    backgroundColor: Color,
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = backgroundColor
+        ),
         navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
@@ -138,7 +148,7 @@ fun CreateNoteTopBar(
     )
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteTitleInput(text: String, onTextChange: (String) -> Unit) {
     TextField(
@@ -156,7 +166,7 @@ fun NoteTitleInput(text: String, onTextChange: (String) -> Unit) {
     )
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateNoteText(text: String, onTextChange: (String) -> Unit) {
     TextField(
