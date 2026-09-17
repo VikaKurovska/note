@@ -9,4 +9,5 @@ sealed class NavRoutes(val route: String) {
         }
     }
     object NotesScreen : NavRoutes("notesScreen")
+    object MainScreen: NavRoutes("mainScreen")
 }

@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.example.note.presentation.main_notes_screen.NotesScreen
 import com.example.note.data.database.NoteDatabase // 👈 Перевір свій шлях до бази даних
 import com.example.note.data.repository.NoteRepository // 👈 Перевір шлях до репозиторію
+import com.example.note.presentation.main.MainScreen
 import com.example.note.presentation.new_note_screen.CreateEditNoteScreen
 import com.example.note.presentation.viewmodel.NewNoteVM
 
@@ -21,10 +22,10 @@ fun NotesNavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.NotesScreen.route
+        startDestination = NavRoutes.MainScreen.route
     ) {
-        composable(NavRoutes.NotesScreen.route) {
-            NotesScreen(
+        composable(NavRoutes.MainScreen.route) {
+            MainScreen(
                 onAddNoteClick = {
                     navController.navigate(NavRoutes.CreateNote.passId(-1))
                 },

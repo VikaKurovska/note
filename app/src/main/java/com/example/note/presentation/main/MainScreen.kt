@@ -33,14 +33,14 @@ sealed class MainTab(val route:String, val title:String, val icon: ImageVector) 
     data object Archive : MainTab("archive", "ArchiveNote", Icons.Default.Archive)
 
     companion object {
-        val items = listOf(Notes, Settings, Archive)
+        val items = listOf(Notes, Archive, Settings)
     }
 }
 
 @Composable
 fun MainScreen(
     onAddNoteClick: () -> Unit,
-    onNoteClick: () -> Unit
+    onNoteClick: (Int) -> Unit
 ) {
     val tabNavController = rememberNavController()
     val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
@@ -54,18 +54,15 @@ fun MainScreen(
                         label = { Text(screen.title) },
                         selected = currentRoute == screen.route,
                         onClick = {
-                                if (currentRoute != screen.route) {
-                                    tabNavController.navigate(screen.route) {
-                                        // Очищает стек до начального экрана, чтобы не копить историю
-                                        popUpTo(tabNavController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        // Избегает создания копий одного и того же экрана при повторном клике
-                                        launchSingleTop = true
-                                        // Восстанавливает состояние экрана (например, прокрутку списков)
-                                        restoreState = true
+                            if (currentRoute != screen.route) {
+                                tabNavController.navigate(screen.route) {
+                                    popUpTo(tabNavController.graph.findStartDestination().id) {
+                                        saveState = true
                                     }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
+                            }
                         }
                     )
                 }
@@ -73,13 +70,19 @@ fun MainScreen(
         }
     ) { innerPadding ->
         NavHost(
-        navController = tabNavController,
-        startDestination = MainTab.Notes.route,
-        modifier = Modifier.padding(innerPadding)
-    ) {
-        composable(MainTab.Notes.route) { NotesScreen() }
-        composable(MainTab.Archive.route) { ArchiveScreen() }
-        composable(MainTab.Settings.route) { SettingsScreen() }
-    }
+            navController = tabNavController,
+            startDestination = MainTab.Notes.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(MainTab.Notes.route) {
+                NotesScreen(
+                    onAddNoteClick = onAddNoteClick,
+                    onNoteClick = onNoteClick
+                ) }
+            composable(MainTab.Archive.route) { ArchiveScreen(
+
+            ) }
+            composable(MainTab.Settings.route) { SettingsScreen() }
+        }
     }
 }
