@@ -31,5 +31,6 @@ fun EmptyNoteScreen(){
             )
             Text(text = "Create your first note !", fontSize = 20.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth() .padding(top = 12.dp))
         }
+            //попа
     }
 }
