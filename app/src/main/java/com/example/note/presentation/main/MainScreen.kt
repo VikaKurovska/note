@@ -22,7 +22,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 
 import androidx.navigation.compose.composable
 import com.example.note.presentation.archive.ArchiveScreen
-import com.example.note.presentation.main_notes_screen.NotesScreen
+import com.example.note.presentation.main_notes_screen.MainNotesScreen
 import com.example.note.presentation.profile.SettingsScreen
 
 
@@ -40,7 +40,7 @@ sealed class MainTab(val route:String, val title:String, val icon: ImageVector) 
 @Composable
 fun MainScreen(
     onAddNoteClick: () -> Unit,
-    onNoteClick: (Int) -> Unit
+    onNoteClick: (Int) -> Unit,
 ) {
     val tabNavController = rememberNavController()
     val navBackStackEntry by tabNavController.currentBackStackEntryAsState()
@@ -75,9 +75,9 @@ fun MainScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(MainTab.Notes.route) {
-                NotesScreen(
+                MainNotesScreen(
                     onAddNoteClick = onAddNoteClick,
-                    onNoteClick = onNoteClick
+                    onNoteClick = onNoteClick,
                 ) }
             composable(MainTab.Archive.route) { ArchiveScreen(
 

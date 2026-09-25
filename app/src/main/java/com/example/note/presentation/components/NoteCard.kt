@@ -1,6 +1,7 @@
 package com.example.note.presentation.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,20 +24,22 @@ import com.example.note.presentation.theme.toComposeColor
 import com.example.note.utils.timeConvertion
 
 @Composable
-fun NoteGridCard(note: Note, onClick: (Int) -> Unit) {
+fun NoteGridCard(note: Note, onClick: (Int) -> Unit, onLongClick: (Int) -> Unit) {
     NoteCard(
         note = note,
         titleAlign = TextAlign.Start,
         onClick = onClick,
+        onLongClick =  onLongClick,
     )
 }
 
 @Composable
-fun NoteListCard(note: Note, onClick: (Int) -> Unit) {
+fun NoteListCard(note: Note, onClick: (Int) -> Unit, onLongClick: (Int) -> Unit) {
     NoteCard(
         note = note,
         titleAlign = TextAlign.Center,
         onClick = onClick,
+        onLongClick =  onLongClick,
     )
 }
 
@@ -45,12 +48,15 @@ private fun NoteCard(
     note: Note,
     titleAlign: TextAlign,
     onClick: (Int) -> Unit,
+    onLongClick: (Int) -> Unit,
 ) {
     val formattedTime = timeConvertion(note.timestamp)
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = { onClick(note.id) }),
+            .combinedClickable(
+                onClick = { onClick(note.id) },
+                onLongClick = {onLongClick(note.id)}),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = note.color.toComposeColor(),

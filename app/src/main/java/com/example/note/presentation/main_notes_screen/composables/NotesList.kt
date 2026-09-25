@@ -15,11 +15,13 @@ import com.example.note.data.entity.Note
 import com.example.note.presentation.components.NoteGridCard
 import com.example.note.presentation.components.NoteListCard
 
+
 @Composable
 fun NotesList(
     notes: List<Note>,
     mode: NotesListModes,
     onNoteClick: (Int) -> Unit,
+    onLongClick: (Int) -> Unit
 ) {
     if (mode == NotesListModes.GRID) {
         LazyVerticalStaggeredGrid(
@@ -33,7 +35,7 @@ fun NotesList(
                 items = notes,
                 key = { it.id },
             ) { note ->
-                NoteGridCard(note = note, onClick = onNoteClick)
+                NoteGridCard(note = note, onClick = onNoteClick, onLongClick = onLongClick)
             }
         }
     } else {
@@ -46,7 +48,7 @@ fun NotesList(
                 items = notes,
                 key = { it.id },
             ) { note ->
-                NoteListCard(note = note, onClick = onNoteClick)
+                NoteListCard(note = note, onClick = onNoteClick, onLongClick = onLongClick)
             }
         }
     }

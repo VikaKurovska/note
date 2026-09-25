@@ -1,6 +1,7 @@
 package com.example.note.presentation.main_notes_screen
 
 import android.app.Application
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,7 +27,25 @@ class MainNotesViewModel @Inject constructor (private val repository: NoteReposi
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = emptyList()
         )
-}
+
+    fun deleteNote(noteId: Int) {
+        viewModelScope.launch {
+            repository.deleteNote(noteId)
+        }
+    }
+        fun archiveNote(noteId: Int) {
+            viewModelScope.launch {
+                repository.archiveNote(noteId)
+            }
+        }
+
+        fun updateNoteColor(note: Note, newColor: Int) {
+            viewModelScope.launch {
+                repository.updateNoteColor(note, newColor)
+            }
+        }
+    }
+
 /*
 class NoteViewModelFactory(val application: Application) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

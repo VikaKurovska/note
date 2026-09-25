@@ -36,4 +36,8 @@ class NoteRepository @Inject constructor (private val noteDao: NoteDao) {
     suspend fun unarchiveNote(id: Int) = withContext(Dispatchers.IO) {
         noteDao.unarchiveNote(id)
     }
+    suspend fun updateNoteColor(note: Note, newColor: Int){
+        val updatedNote = note.copy(color = newColor)
+        noteDao.updateNote(updatedNote)
+    }
 }

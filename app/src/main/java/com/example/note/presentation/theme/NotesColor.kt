@@ -11,7 +11,7 @@ object NoteColors {
         0xFFC8E6C9.toInt(),
         0xFFFFE0B2.toInt(),
     )
-
+    val composeColors: List<Color> = palette.map { it.toComposeColor() }
     val defaultColor = palette.first()
     val onCard = 0xFF1C1B1F.toInt()
 
