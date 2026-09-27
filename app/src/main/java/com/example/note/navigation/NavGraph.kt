@@ -27,6 +27,7 @@ fun NotesNavGraph() {
                 onNoteClick = { id ->
                     navController.navigate(NavRoutes.CreateNote.passId(id))
                 }
+
             )
         }
 

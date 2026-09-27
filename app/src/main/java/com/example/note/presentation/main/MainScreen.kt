@@ -79,9 +79,11 @@ fun MainScreen(
                     onAddNoteClick = onAddNoteClick,
                     onNoteClick = onNoteClick,
                 ) }
-            composable(MainTab.Archive.route) { ArchiveScreen(
-
-            ) }
+            composable(MainTab.Archive.route) {
+                ArchiveScreen(
+onNoteClick = onNoteClick
+                )
+            }
             composable(MainTab.Settings.route) { SettingsScreen() }
         }
     }

@@ -34,7 +34,9 @@ class NewNoteVM @Inject constructor(
     // ID поточної нотатки (null = нова нотатка, ще не в базі)
     private var noteId: Int? = null
 
-    init {
+    private val _isArchived = MutableStateFlow(false)
+    val isArchived: StateFlow<Boolean> = _isArchived.asStateFlow()
+    fun listenNoteChanges() {
         // Автозбереження: чекаємо 1 сек (1000 ms) після зупинки друку
         viewModelScope.launch {
             combine(_title, _content, _selectedColor) { title, content, color ->
@@ -65,13 +67,18 @@ class NewNoteVM @Inject constructor(
         if (id == -1) return // Нова нотатка
 
         noteId = id
+
         viewModelScope.launch {
             repository.getNoteById(id)?.let { note ->
                 _title.value = note.title
                 _content.value = note.content
                 _selectedColor.value = note.color
+                _isArchived.value = note.isArchived
             }
+
+            listenNoteChanges()
         }
+
     }
 
     // Внутрішнє автозбереження
@@ -84,6 +91,7 @@ class NewNoteVM @Inject constructor(
                 title = title,
                 content = content,
                 color = color,
+                isArchived = _isArchived.value,
                 timestamp = System.currentTimeMillis()
             )
             val generatedId = repository.insertNote(newNote)
@@ -95,7 +103,9 @@ class NewNoteVM @Inject constructor(
                 title = title,
                 content = content,
                 color = color,
+                isArchived = _isArchived.value,
                 timestamp = System.currentTimeMillis()
+
             )
             repository.updateNote(updatedNote)
         }

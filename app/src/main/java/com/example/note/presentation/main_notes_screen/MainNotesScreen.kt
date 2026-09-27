@@ -177,12 +177,14 @@ fun MainNotesScreen(
                 }
                 selectedNoteId = null
             },
-            onArchiveClick = {
+            onArchiveAction = {
                 selectedNoteId?.let { id ->
                     viewModel.archiveNote(id)
                 }
                 selectedNoteId = null
             },
+            archiveActionText = "В архів",
+
             onDeleteClick = {
                 showDeleteDialog = true
             }

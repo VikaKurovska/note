@@ -42,9 +42,10 @@ fun NoteActionBottomSheet(
     note: Note?,
     onDismiss: () -> Unit,
     onColorSelected: (Color) -> Unit,
-    onArchiveClick: () -> Unit,
+    onArchiveAction: () -> Unit,
+    archiveActionText: String,
     onDeleteClick: () -> Unit,
-    colors: List<Color>
+    colors: List<Color>,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -114,7 +115,7 @@ fun NoteActionBottomSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onArchiveClick() }
+                    .clickable { onArchiveAction() }
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -125,7 +126,7 @@ fun NoteActionBottomSheet(
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "В архів",
+                    text = archiveActionText,
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
